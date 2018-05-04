@@ -10,6 +10,8 @@ var client = new Twitter(keys.twitter)
 
 var omdb = require("omdb")
 
+var fs = require("fs");
+
 
 var programToRun = process.argv[2]
 var programAction = process.argv.slice(3)
@@ -60,7 +62,7 @@ function spotifyThisSong() {
         // A preview link of the song from Spotify
         console.log("Preview Link: ", data.tracks.items[0].album.external_urls.spotify)
         // The album that the song is from
-        console.log("Album: ",data.tracks.items[0].album.type); 
+        console.log("Album: ",data.tracks.items[0].album.name); 
 
 
       //starter object
@@ -71,40 +73,62 @@ function spotifyThisSong() {
 
 function movieThis() {
     console.log("running movie program")
+
+    var request = require("request");
+
+    var nodeArgs = process.argv.slice(2) 
+
+    var movieName = ""
+
+for(var i=2;i<nodeArgs.length;i++) {
+    
+    if(i>2 && i<nodeArgs.length) {
+    movieName = movieName + "+" + nodeArgs[i]
+} else {
+    movieName += nodeArgs[i]
+    }
+        }
+
+var queryUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=trilogy";
+
+console.log(queryUrl)
+
+request(queryUrl, function(error, response, body){
+    if(error) {
+        return console.log(error)
+    }
+
+    if(!error && response.statusCode === 200) {
+        
+        console.log("Title" + JSON.parse(body).Title);
+        console.log("Release Year: " + JSON.parse(body).Year);
+        console.log("Actors" + JSON.parse(body).Actors);
+        //console.log(response)
+        
+            }
+        }
+    )
 }
 
 function doWhatItSays() {
-    console.log("do what it says")
+    fs.readFile("random.txt", "utf8", function(err, data) {
+		if (err) {
+			logOutput.error(err);
+		} else {
+
+			// Creates array with data.
+			var randomArray = data.split(",");
+
+			// Sets action to first item in array.
+			action = randomArray[0];
+
+			// Sets optional third argument to second item in array.
+			argument = randomArray[1];
+
+			// Calls main controller to do something based on action and argument.
+			console.log(action + argument)
+		}
+	});
 }
-// OMDB request
-// var request = require("request");
 
-// var nodeArgs = process.argv 
 
-// var movieName = ""
-
-// for(var i=2;i<nodeArgs.length;i++) {
-//     if(i>2 && i<nodeArgs.length) {
-//     movieName = movieName + "+" + nodeArgs[i]
-// } else {
-//     movieName += nodeArgs[i]
-//     }
-//         }
-
-// var queryUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=trilogy";
-
-// console.log(queryUrl)
-
-// request(queryUrl, function(error, response, body){
-//     if(error) {
-//         return console.log(error)
-//     }
-
-//     if(!error && response.statusCode === 200) {
-//         console.log("Title" + JSON.parse(body).Title);
-//         console.log("Release Year: " + JSON.parse(body).Year);
-//         console.log("Actors" + JSON.parse(body).Actors);
-        
-//     }
-// }
-// )
