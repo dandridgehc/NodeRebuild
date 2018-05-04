@@ -12,7 +12,7 @@ var omdb = require("omdb")
 
 
 var programToRun = process.argv[2]
-var programAction = process.argv[3]
+var programAction = process.argv.slice(3)
 
 if(programToRun === "my-tweets") {
     myTweets()
@@ -31,7 +31,7 @@ function myTweets() {
     var params = {screen_name: 'nodejs'};
     client.get('statuses/user_timeline', params, function(error, tweets, response) {
         if (!error) {
-            for(var i=0;i<5;i++) {
+            for(var i=0;i<19;i++) {
                 console.log(tweets[i].created_at);
                 console.log(tweets[i].text)
                 console.log("")
@@ -44,18 +44,23 @@ function myTweets() {
 function spotifyThisSong() {
     console.log("running spotify program")
         //after we get this working replace "all the small things" with program action
-    spotify.search({ type: 'track', query: 'All the Small Things' }, function(err, data) {
+            if(process.argv[3] === undefined) {
+              var searchTerm = "The Sign Ace of Base"
+            }
+    
+        spotify.search({ type: 'track', query: programAction }, function(err, data) {
         if (err) {
-          return console.log('Error occurred: ' + err);
+          return console.log('TYPE IN A SONG FOO' + err);
         }
         //Artist(s)
-        console.log(data.tracks.items[0])
+        console.log("")
+        console.log("Artist: ", data.tracks.items[0].album.artists[0].name)
         // The song's name
-        console.log(data.tracks.items[0])
+        console.log("Song Name: ", data.tracks.items[0].album.name)
         // A preview link of the song from Spotify
-        console.log(data.tracks.items[0])
+        console.log("Preview Link: ", data.tracks.items[0].album.external_urls.spotify)
         // The album that the song is from
-      console.log(data.tracks.items[0].album.name); 
+        console.log("Album: ",data.tracks.items[0].album.type); 
 
 
       //starter object
