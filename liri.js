@@ -1,6 +1,7 @@
 require("dotenv").config()
 
 var keys = require("./keys.js")
+var request = require("request");
 
 var Spotify = require("node-spotify-api")
 var spotify = new Spotify(keys.spotify)
@@ -14,19 +15,21 @@ var fs = require("fs");
 
 
 var programToRun = process.argv[2]
-var programAction = process.argv.slice(3)
+var programAction = process.argv[3]
 
-if(programToRun === "my-tweets") {
-    myTweets()
-} else if(programToRun === "spotify-this-song") {
-    spotifyThisSong()
-} else if(programToRun === "movie-this") {
-    movieThis()
-} else if(programToRun === "do-what-it-says") {
-    doWhatItSays() 
-} else {
-    console.log("you need to specify a program")
-}
+
+    if(programToRun === "my-tweets") {
+        myTweets()
+    } else if(programToRun === "spotify-this-song") {
+        spotifyThisSong()
+    } else if(programToRun === "movie-this") {
+        movieThis()
+    } else if(programToRun === "do-what-it-says") {
+        doWhatItSays() 
+    } else {
+        console.log("you need to specify a program")
+    }
+   
 
 function myTweets() {
     // console.log("running twitter program")
@@ -46,7 +49,7 @@ function myTweets() {
 function spotifyThisSong() {
     console.log("running spotify program")
         //after we get this working replace "all the small things" with program action
-            if(process.argv[3] === undefined) {
+            if(programAction === undefined) {
               var searchTerm = "The Sign Ace of Base"
             }
     
@@ -71,23 +74,25 @@ function spotifyThisSong() {
 
 }
 
-function movieThis() {
+function movieThis(programAction) {
     console.log("running movie program")
+        if(programAction != undefined) {
+            //console.log(programAction)
+            var movieName = programAction
+        } else {
+            var nodeArgs = process.argv
 
-    var request = require("request");
+            var movieName = ""
 
-    var nodeArgs = process.argv.slice(2) 
-
-    var movieName = ""
-
-for(var i=2;i<nodeArgs.length;i++) {
-    
-    if(i>2 && i<nodeArgs.length) {
-    movieName = movieName + "+" + nodeArgs[i]
-} else {
-    movieName += nodeArgs[i]
-    }
+            for(var i=3;i<nodeArgs.length;i++) {  
+                if(i>3 && i<nodeArgs.length) {
+                    movieName = movieName + "+" + nodeArgs[i]
+                } else {
+                    movieName += nodeArgs[i]
+                }
+             }
         }
+    
 
 var queryUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=trilogy";
 
@@ -103,6 +108,7 @@ request(queryUrl, function(error, response, body){
         console.log("Title" + JSON.parse(body).Title);
         console.log("Release Year: " + JSON.parse(body).Year);
         console.log("Actors" + JSON.parse(body).Actors);
+     
         //console.log(response)
         
             }
@@ -116,17 +122,38 @@ function doWhatItSays() {
 			logOutput.error(err);
 		} else {
 
-			// Creates array with data.
+     
+			//Creates array with data.
 			var randomArray = data.split(",");
 
 			// Sets action to first item in array.
-			action = randomArray[0];
-
+			var action = randomArray[0]
+            //var aLength = action.length
+           // action = action.slice()
+            //console.log("action", action)
+            //console.log(typeof(action))
 			// Sets optional third argument to second item in array.
-			argument = randomArray[1];
+            var argument = randomArray[1];
+            
+            if(action == "movie-this"){
+                 movieThis(argument)
+                 console.log(action.length)
+            }
 
-			// Calls main controller to do something based on action and argument.
-			console.log(action + argument)
+           
+
+            // if(action === "my-tweets") {
+            //     myTweets()
+            // } else if(action === "spotify-this-song") {
+            //     spotifyThisSong()
+            // } else if(action === "movie-this") {
+            //     console.log("movie this happened")
+            //     movieThis(argument)
+            // } else {
+            //     console.log("nothing happened")
+            // }
+
+			
 		}
 	});
 }
